@@ -7,8 +7,37 @@
 ;; -------------------------
 ;; Views
 
+(re-frame/register-handler
+  :initialise-db
+  (fn
+    [db v]
+    {:phones [{:name "Nexus S" :snippet "You'll go faster with a Nexus S"}
+              {:name "Motorola Xoom with WIFI" :snippet "The Previous Generatoin of Tablet"}
+              {:name "Motorola Xoom 2" :snippet "The Next Prevoius Generation"}]}))
+
+(re-frame/dispatch  [:initialise-db])
+
+(re-frame/register-sub
+  :phones
+  (fn [db]
+    (reaction (:phones @db))))
+
+(defn phone-component
+  [phone]
+  [:li
+   [:span (:name @phone)]
+   [:p (:snippet @phone)]])
+
+(defn phones-component
+  []
+  (let [phones (re-frame/subscribe [:phones])]
+    (fn []
+      [:ul (for [phone in @phones]
+             ^{:key (:name phone)} [phone-component phone])])))
+
 (defn home-page []
   [:div [:h2 "Welcome to angular-phonecat-re-frame"]
+   [phones-component]
    [:div [:a {:href "/about"} "go to about page"]]])
 
 (defn about-page []
